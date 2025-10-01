@@ -24,6 +24,11 @@
     <modules>
 		<module>common</module>
         <module>identify</module>
+        <module>information</module>
+        <module>logger</module>
+        <module>notification</module>
+        <module>payment</module>
+        <module>product</module>
         <!--		<module>logger</module>-->
 <!--		<module>identify</module>-->
 <!--        <module>information</module>-->
