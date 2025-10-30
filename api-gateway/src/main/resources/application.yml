@@ -1,0 +1,171 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      # Enable discovery locator to automatically create routes based on services registered with Eureka
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+      # Custom route configurations
+      routes:
+        # Identity Service Routes
+        - id: identify-service
+          uri: lb://identify
+          predicates:
+            - Path=/api/identity/**
+          filters:
+            - StripPrefix=2
+            - name: CircuitBreaker
+              args:
+                name: identifyCircuitBreaker
+                fallbackUri: forward:/fallback/identify
+
+        # Information Service Routes
+        - id: information-service
+          uri: lb://information
+          predicates:
+            - Path=/api/information/**
+          filters:
+            - StripPrefix=2
+            - name: CircuitBreaker
+              args:
+                name: informationCircuitBreaker
+                fallbackUri: forward:/fallback/information
+
+        # Product Service Routes
+        - id: product-service
+          uri: lb://product
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - StripPrefix=2
+            - name: CircuitBreaker
+              args:
+                name: productCircuitBreaker
+                fallbackUri: forward:/fallback/product
+
+        # Payment Service Routes
+        - id: payment-service
+          uri: lb://payment
+          predicates:
+            - Path=/api/payment/**
+          filters:
+            - StripPrefix=2
+            - name: CircuitBreaker
+              args:
+                name: paymentCircuitBreaker
+                fallbackUri: forward:/fallback/payment
+
+        # Notification Service Routes
+        - id: notification-service
+          uri: lb://notification
+          predicates:
+            - Path=/api/notification/**
+          filters:
+            - StripPrefix=2
+            - name: CircuitBreaker
+              args:
+                name: notificationCircuitBreaker
+                fallbackUri: forward:/fallback/notification
+
+        # Logger Service Routes
+        - id: logger-service
+          uri: lb://logger
+          predicates:
+            - Path=/api/logger/**
+          filters:
+            - StripPrefix=2
+            - name: CircuitBreaker
+              args:
+                name: loggerCircuitBreaker
+                fallbackUri: forward:/fallback/logger
+
+      # Global CORS configuration
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: false
+
+    # Load Balancer configuration
+    loadbalancer:
+      ribbon:
+        enabled: false
+      # Use Round Robin as default load balancing strategy
+      configurations: default
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+# Resilience4j Circuit Breaker Configuration
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 10s
+        failure-rate-threshold: 50
+        slow-call-duration-threshold: 2s
+        slow-call-rate-threshold: 50
+    instances:
+      identifyCircuitBreaker:
+        base-config: default
+      informationCircuitBreaker:
+        base-config: default
+      productCircuitBreaker:
+        base-config: default
+      paymentCircuitBreaker:
+        base-config: default
+      notificationCircuitBreaker:
+        base-config: default
+      loggerCircuitBreaker:
+        base-config: default
+
+  # Time Limiter Configuration
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 5s
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,metrics
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty: INFO

@@ -29,6 +29,8 @@
         <module>notification</module>
         <module>payment</module>
         <module>product</module>
+		<module>eureka-server</module>
+		<module>api-gateway</module>
         <!--		<module>logger</module>-->
 <!--		<module>identify</module>-->
 <!--        <module>information</module>-->
