@@ -1,6 +1,8 @@
 server:
   port: 7081
 spring:
+  application:
+    name: product
   elasticsearch:
     uris: http://localhost:9200
     username: elastic
@@ -38,3 +40,13 @@ spring:
   main:
     allow-bean-definition-overriding:
       true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
