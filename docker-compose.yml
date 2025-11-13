@@ -1,0 +1,42 @@
+#version: "3"
+services:
+  zookeeper:
+    image: 'confluentinc/cp-zookeeper:7.5.0'  # Confluent Zookeeper image
+    container_name: zookeeper
+    hostname: zookeeper
+    ports:
+      - '2181:2181'  # Cổng kết nối đến Zookeeper
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181  # Cổng Zookeeper cho client kết nối
+      - ZOOKEEPER_TICK_TIME=2000    # Thời gian cho mỗi tick (đơn vị thời gian của Zookeeper)
+
+  kafka:
+    image: 'confluentinc/cp-kafka:7.5.0'  # Confluent Kafka image
+    container_name: kafka
+    hostname: kafka
+    ports:
+      - '9092:9092'  # Cổng Kafka broker
+    environment:
+      - KAFKA_BROKER_ID=1  # ID của Kafka broker
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181  # Kết nối Kafka đến Zookeeper
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092  # Quảng bá địa chỉ Kafka
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1  # Số lượng bản sao của offset topic
+    depends_on:
+      - zookeeper  # Kafka phụ thuộc vào Zookeeper
+
+  elasticsearch:
+    image: 'docker.elastic.co/elasticsearch/elasticsearch:8.6.0'
+    container_name: elasticsearch
+    hostname: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=changeme # Mật khẩu mặc định cho tài khoản elastic
+      - xpack.security.authc.apiKey.enabled=true # Kích hoạt API key
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+volumes:
+  elasticsearch_data:
