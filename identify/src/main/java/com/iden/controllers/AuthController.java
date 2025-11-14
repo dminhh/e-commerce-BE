@@ -376,6 +376,7 @@ public class AuthController {
     @PostMapping("/registry")
     public ResponseEntity<DataOutput<Object>> registry(@Valid @RequestBody RegistryInput inputDTO) {
         log.info("register");
+        log.info("Input: username={}, email={}, role={}", inputDTO.getUsername(), inputDTO.getEmail(), inputDTO.getRole());
         try {
             DataOutput<Object> dataOutput = DataOutput.builder().build();
             if (accountService.checkIfUsernameExists(inputDTO.getUsername())) {
@@ -409,7 +410,7 @@ public class AuthController {
             return ResponseEntity.ok(dataOutput);
 
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("Registry error: ", e);
             return ResponseEntity.badRequest().body(DataOutput.builder().message("Gap loi server, kiem tra log").build());
         }
     }
