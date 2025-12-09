@@ -27,6 +27,8 @@ else
     lsof -ti:8080 | xargs kill -9 2>/dev/null
     lsof -ti:6066 | xargs kill -9 2>/dev/null
     lsof -ti:7071 | xargs kill -9 2>/dev/null
+    lsof -ti:8888 | xargs kill -9 2>/dev/null
+    lsof -ti:7081 | xargs kill -9 2>/dev/null
 
     echo "Done!"
 fi

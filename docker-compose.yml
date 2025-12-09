@@ -24,6 +24,19 @@ services:
     depends_on:
       - zookeeper  # Kafka phụ thuộc vào Zookeeper
 
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - '9000:8080'
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
+    depends_on:
+      - kafka
+      - zookeeper
+
   elasticsearch:
     image: 'docker.elastic.co/elasticsearch/elasticsearch:8.6.0'
     container_name: elasticsearch
