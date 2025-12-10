@@ -3,6 +3,11 @@ server:
 spring:
   application:
     name: product
+#  sql:
+#    init:
+#      mode: always
+#      data-locations: classpath:product4.sql
+#      encoding: UTF-8
   elasticsearch:
     uris: http://localhost:9200
     username: elastic

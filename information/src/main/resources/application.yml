@@ -1,6 +1,14 @@
 spring:
   application:
     name: information
+#  sql:
+#    init:
+#      mode: always
+#      data-locations:
+##        - classpath:city.sql
+#        - classpath:district.sql
+#        - classpath:wards.sql
+#      encoding: UTF-8
   jpa:
     hibernate:
       ddl-auto: update
