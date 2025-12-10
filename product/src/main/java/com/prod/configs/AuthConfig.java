@@ -47,6 +47,8 @@ public class AuthConfig {
                                 //size
                                 "/api/size/all",
                                 "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
                                 //season
                                 "/api/season/all",
                                 "/api/season/byYear",
