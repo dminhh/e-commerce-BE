@@ -23,12 +23,13 @@ else
     echo "Trying to kill by port..."
 
     # Kill by port as fallback
-    lsof -ti:8761 | xargs kill -9 2>/dev/null
-    lsof -ti:8080 | xargs kill -9 2>/dev/null
-    lsof -ti:6066 | xargs kill -9 2>/dev/null
-    lsof -ti:7071 | xargs kill -9 2>/dev/null
-    lsof -ti:8888 | xargs kill -9 2>/dev/null
-    lsof -ti:7081 | xargs kill -9 2>/dev/null
+    lsof -ti:8761 | xargs kill -9 2>/dev/null  # Eureka
+    lsof -ti:8080 | xargs kill -9 2>/dev/null  # API Gateway
+    lsof -ti:6066 | xargs kill -9 2>/dev/null  # Information
+    lsof -ti:7071 | xargs kill -9 2>/dev/null  # Identify
+    lsof -ti:8888 | xargs kill -9 2>/dev/null  # Notification
+    lsof -ti:7081 | xargs kill -9 2>/dev/null  # Product
+    lsof -ti:9898 | xargs kill -9 2>/dev/null  # Payment
 
     echo "Done!"
 fi
