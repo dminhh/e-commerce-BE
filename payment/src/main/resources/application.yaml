@@ -22,19 +22,9 @@ server:
 payment:
   vnPay:
     url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-    tmnCode: PBIN4938
-    secretKey: SNQ22FQT9P9VMNP4ZMO1A23QLNQCKG6O
+    tmnCode: FOV64FYA
+    secretKey: O8ET902XJJX6JYLU94I0H5XIBSRGU7LR
     returnUrl: http://localhost:9898/api/v1/payment/vn-pay-callback
     version: 2.1.0
     command: pay
     orderType: other
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-    register-with-eureka: true
-    fetch-registry: true
-  instance:
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
