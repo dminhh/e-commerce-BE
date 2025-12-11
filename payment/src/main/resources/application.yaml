@@ -22,8 +22,8 @@ server:
 payment:
   vnPay:
     url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-    tmnCode: PBIN4938
-    secretKey: SNQ22FQT9P9VMNP4ZMO1A23QLNQCKG6O
+    tmnCode: FOV64FYA
+    secretKey: O8ET902XJJX6JYLU94I0H5XIBSRGU7LR
     returnUrl: http://localhost:9898/api/v1/payment/vn-pay-callback
     version: 2.1.0
     command: pay
