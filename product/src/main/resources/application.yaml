@@ -55,3 +55,10 @@ eureka:
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+# Chatbot Configuration
+chatbot:
+  flask:
+    url: http://localhost:5001
+    chat-endpoint: /chat
+    timeout-ms: 10000
