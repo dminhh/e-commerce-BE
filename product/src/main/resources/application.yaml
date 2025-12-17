@@ -61,4 +61,10 @@ chatbot:
   flask:
     url: http://localhost:5001
     chat-endpoint: /chat
-    timeout-ms: 10000
+    timeout-ms: 30000  # 30s cho streaming
+
+# Logging
+logging:
+  level:
+    com.prod.RAG: DEBUG
+    reactor.netty: DEBUG

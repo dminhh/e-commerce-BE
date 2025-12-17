@@ -54,6 +54,8 @@ public class AuthConfig {
                                 "/api/season/byYear",
                                 //RAG
                                 "/api/ques/ask",
+                                //chatbot
+                                "/api/chatbot/**",
                                 //review
                                 "/api/review/byProductId",
                                 "/api/review/get",

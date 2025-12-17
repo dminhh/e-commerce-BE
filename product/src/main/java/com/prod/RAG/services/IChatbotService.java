@@ -1,10 +1,9 @@
 package com.prod.RAG.services;
 
-import com.prod.RAG.model.ChatRequest;
-import com.prod.RAG.model.ChatResponse;
+import com.prod.RAG.model.ChatStreamChunk;
+import reactor.core.publisher.Flux;
 
 public interface IChatbotService {
 
-    ChatResponse chat(ChatRequest request);
-
+    Flux<ChatStreamChunk> chatStream(String question);
 }
