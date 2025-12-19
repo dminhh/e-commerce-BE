@@ -4,7 +4,6 @@ import com.prod.chains.Chain;
 import com.prod.chains.ChainHandler;
 import com.prod.chains.data.ChainData;
 import com.prod.facades.data.ProductInfo;
-import com.prod.facades.flaskAPIs.GetLabelFromFlask;
 import com.prod.models.products.Label;
 import com.prod.models.products.Label_Product;
 import com.prod.services.products.ILabelProductService;
@@ -23,7 +22,6 @@ import java.util.Optional;
 public class GetLabelByName implements ChainHandler<ProductInfo> {
     private final ILabelService labelService;
     private final ILabelProductService labelProductService;
-    private final GetLabelFromFlask flask;
 
     @Override
     public Chain<ProductInfo> handle(ChainData<ProductInfo> chainData) {
@@ -33,22 +31,7 @@ public class GetLabelByName implements ChainHandler<ProductInfo> {
                     chainData.getValue().getProductId()
             );
             List<Label> labels = getLabelByName(chainData.getValue().getLabel());
-            String[] suggestedLabels = flask.getCustomLabel(dto.getProductId(), dto.getTitle(), dto.getLabel());
-            if (suggestedLabels != null) {
-                for (String suggestedLabel : suggestedLabels) {
-                    suggestedLabel = suggestedLabel.replace("\\[\\]", "");
-                    suggestedLabel = suggestedLabel.substring(0, 1).toUpperCase() + suggestedLabel.substring(1).toLowerCase();
-                    Optional<Label> l = labelService.getLabelByName(suggestedLabel);
-                    if (l.isPresent()) {
-                        if (!labels.contains(l.get())) labels.add(l.get());
-                    } else {
-                        labels.add(Label.builder()
-                                .name(suggestedLabel)
-                                .code(suggestedLabel.toUpperCase())
-                                .build());
-                    }
-                }
-            }
+
             if (labelProducts.isEmpty()) {
                 List<String> labelsName = createListLabel(labels, chainData.getValue().getProductId());
                 dto.setLabel(labelsName);

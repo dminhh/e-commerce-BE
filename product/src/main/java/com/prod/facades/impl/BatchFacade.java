@@ -4,7 +4,6 @@ import com.common.DTO.ResponseObject;
 import com.prod.JPARepositories.batchs.ProductDataRepository;
 import com.prod.batch.DTO.ProductData;
 import com.prod.facades.IBatchFacade;
-import com.prod.facades.flaskAPIs.GetLabelFromFlask;
 import com.prod.models.ENUM.Type_Image;
 import com.prod.models.carts.Color;
 import com.prod.models.carts.Color_Size_Product;
@@ -73,8 +72,6 @@ public class BatchFacade implements IBatchFacade {
     private ProductDataRepository dataRepository;
     @Autowired
     private ISmallQuantityService smallQuantityService;
-    @Autowired
-    private GetLabelFromFlask flask;
 
     @Override
     public ResponseObject<String> insertDetail() {
@@ -403,10 +400,7 @@ public class BatchFacade implements IBatchFacade {
     }
 
     private Set<String> createLabelProduct(Category category, int productId, String title, List<String> sig) {
-        String[] cateCode = flask.getLabel(title);
-        if (cateCode == null) {
-            cateCode = category.getName().toUpperCase().split(" ");
-        }
+        String[] cateCode = category.getName().toUpperCase().split(" ");
         Set<String> sigBuilder = new HashSet<>(sig);
         for (String s : cateCode) {
             s = s.replace("\\[\\]", "");

@@ -8,7 +8,6 @@ import com.prod.chains.data.ChainData;
 import com.prod.chains.getProducts.*;
 import com.prod.facades.IProductFacade;
 import com.prod.facades.data.ProductInfo;
-import com.prod.facades.flaskAPIs.GetLabelFromFlask;
 import com.prod.facades.flaskAPIs.UpdateFAISSIndex;
 import com.prod.models.details.Detail;
 import com.prod.models.elk.ESProducts;
@@ -61,8 +60,6 @@ public class ProductFacade implements IProductFacade {
     @Autowired
     private UpdateFAISSIndex updateFAISSIndex;
     @Autowired
-    private GetLabelFromFlask flask;
-    @Autowired
     private IESProductService esService;
     @Autowired
     private ConvertESToProductDTO esToProductDTO;
@@ -84,7 +81,6 @@ public class ProductFacade implements IProductFacade {
                     .add(GetLabelByName.builder()
                             .labelService(labelService)
                             .labelProductService(labelProductService)
-                            .flask(flask)
                             .build())
                     .add(new CreateImages(imageService))
                     .add(CreateCSPs.builder()
@@ -98,8 +94,7 @@ public class ProductFacade implements IProductFacade {
                             .build())
                     .add(CreateSignature.builder()
                             .productService(productService)
-                            .build())
-                    .add(new UpdateFAISSFromFlask(updateFAISSIndex));
+                            .build());
             chain.execute(dataDTO);
             if (dataDTO.isSuccess()) {
                 try {
@@ -110,6 +105,11 @@ public class ProductFacade implements IProductFacade {
                     esService.createProduct(esProducts);
                 } catch (Exception e){
                     log.error(e.getMessage());
+                }
+                try {
+                    updateFAISSIndex.updateIndex();
+                } catch (Exception e){
+                    log.error("Lỗi khi cập nhật product index: " + e.getMessage());
                 }
                 return ResponseObject.<ProductInfo>builder()
                         .data(product)
@@ -145,7 +145,6 @@ public class ProductFacade implements IProductFacade {
                     .add(GetLabelByName.builder()
                             .labelService(labelService)
                             .labelProductService(labelProductService)
-                            .flask(flask)
                             .build())
                     .add(new CreateImages(imageService))
                     .add(CreateCSPs.builder()
@@ -159,14 +158,18 @@ public class ProductFacade implements IProductFacade {
                             .build())
                     .add(CreateSignature.builder()
                             .productService(productService)
-                            .build())
-                    .add(new UpdateFAISSFromFlask(updateFAISSIndex));
+                            .build());
             chain.execute(dataDTO);
             if (dataDTO.isSuccess()) {
                 try {
                     esService.updateProduct(productInfo.getProductId() + "", esToProductDTO.getES(dataDTO.getValue()));
                 } catch (Exception e){
                     log.error(e.getMessage());
+                }
+                try {
+                    updateFAISSIndex.updateIndex();
+                } catch (Exception e){
+                    log.error("Lỗi khi cập nhật product index: " + e.getMessage());
                 }
                 return ResponseObject.<ProductInfo>builder()
                         .data(productInfo)
