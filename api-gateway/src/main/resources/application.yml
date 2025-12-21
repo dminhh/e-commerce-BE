@@ -18,9 +18,8 @@ spring:
         - id: identify-service
           uri: lb://IDENTIFY
           predicates:
-            - Path=/api/identity/**
+            - Path=/api/auth/**
           filters:
-            - StripPrefix=2
             - name: CircuitBreaker
               args:
                 name: identifyCircuitBreaker
@@ -30,9 +29,8 @@ spring:
         - id: information-service
           uri: lb://INFORMATION
           predicates:
-            - Path=/api/information/**
+            - Path=/api/info/**
           filters:
-            - StripPrefix=2
             - name: CircuitBreaker
               args:
                 name: informationCircuitBreaker
@@ -42,9 +40,8 @@ spring:
         - id: product-service
           uri: lb://PRODUCT
           predicates:
-            - Path=/api/product/**
+            - Path=/api/product/**,/api/upload/**,/api/category/**,/api/order/**,/api/cart/**,/api/review/**,/api/label/**,/api/color/**,/api/size/**,/api/season/**,/api/sale/**,/api/batch/**,/api/statistic/**,/api/overview/**,/api/product-elk/**,/api/visual-search/**
           filters:
-            - StripPrefix=2
             - name: CircuitBreaker
               args:
                 name: productCircuitBreaker
@@ -54,9 +51,8 @@ spring:
         - id: payment-service
           uri: lb://PAYMENT
           predicates:
-            - Path=/api/payment/**
+            - Path=/api/v1/payment/**
           filters:
-            - StripPrefix=2
             - name: CircuitBreaker
               args:
                 name: paymentCircuitBreaker
@@ -66,25 +62,23 @@ spring:
         - id: notification-service
           uri: lb://NOTIFICATION
           predicates:
-            - Path=/api/notification/**
+            - Path=/api/notifications/**
           filters:
-            - StripPrefix=2
             - name: CircuitBreaker
               args:
                 name: notificationCircuitBreaker
                 fallbackUri: forward:/fallback/notification
 
-        # Logger Service Routes
-        - id: logger-service
-          uri: lb://LOGGER
-          predicates:
-            - Path=/api/logger/**
-          filters:
-            - StripPrefix=2
-            - name: CircuitBreaker
-              args:
-                name: loggerCircuitBreaker
-                fallbackUri: forward:/fallback/logger
+        # Logger Service Routes (no REST endpoints - event-driven service)
+        # - id: logger-service
+        #   uri: lb://LOGGER
+        #   predicates:
+        #     - Path=/api/logger/**
+        #   filters:
+        #     - name: CircuitBreaker
+        #       args:
+        #         name: loggerCircuitBreaker
+        #         fallbackUri: forward:/fallback/logger
 
       # Global CORS configuration
       globalcors:

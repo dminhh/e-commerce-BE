@@ -61,7 +61,9 @@ public class AuthConfig {
                                 "/api/review/byProductId",
                                 "/api/review/get",
                                 "/api/order/paid",
-                                "/api/product-elk/**"
+                                "/api/product-elk/**",
+                                //upload
+                                "/api/upload/**"
                         )
                         .permitAll()
                         .anyRequest().authenticated()
