@@ -16,7 +16,7 @@ spring:
       routes:
         # Identity Service Routes
         - id: identify-service
-          uri: lb://identify
+          uri: lb://IDENTIFY
           predicates:
             - Path=/api/identity/**
           filters:
@@ -28,7 +28,7 @@ spring:
 
         # Information Service Routes
         - id: information-service
-          uri: lb://information
+          uri: lb://INFORMATION
           predicates:
             - Path=/api/information/**
           filters:
@@ -40,7 +40,7 @@ spring:
 
         # Product Service Routes
         - id: product-service
-          uri: lb://product
+          uri: lb://PRODUCT
           predicates:
             - Path=/api/product/**
           filters:
@@ -52,7 +52,7 @@ spring:
 
         # Payment Service Routes
         - id: payment-service
-          uri: lb://payment
+          uri: lb://PAYMENT
           predicates:
             - Path=/api/payment/**
           filters:
@@ -64,7 +64,7 @@ spring:
 
         # Notification Service Routes
         - id: notification-service
-          uri: lb://notification
+          uri: lb://NOTIFICATION
           predicates:
             - Path=/api/notification/**
           filters:
@@ -76,7 +76,7 @@ spring:
 
         # Logger Service Routes
         - id: logger-service
-          uri: lb://logger
+          uri: lb://LOGGER
           predicates:
             - Path=/api/logger/**
           filters:
@@ -150,7 +150,7 @@ resilience4j:
   timelimiter:
     configs:
       default:
-        timeout-duration: 5s
+        timeout-duration: 35s  # Increased for chatbot streaming (30s + 5s buffer)
 
 # Actuator Configuration
 management:

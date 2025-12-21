@@ -19,7 +19,7 @@ public class FallbackController {
         return Mono.just("Information Service is currently unavailable. Please try again later.");
     }
 
-    @GetMapping("/product")
+    @RequestMapping("/product")
     public Mono<String> productFallback() {
         return Mono.just("Product Service is currently unavailable. Please try again later.");
     }
