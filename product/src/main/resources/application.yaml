@@ -60,6 +60,12 @@ eureka:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 
+# Cloudinary Configuration
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:dggwp5cy2}
+  api-key: ${CLOUDINARY_API_KEY:338747247774813}
+  api-secret: ${CLOUDINARY_API_SECRET:hyA6yc5ZGaGoG_kltKMU5LIsVHw}
+
 # Chatbot Configuration
 chatbot:
   flask:
