@@ -41,7 +41,13 @@ public class SizeService implements ISizeService {
 
     @Override
     public Optional<Size> getSizeByValue(String value) {
-        return sizeRepository.findOne(byValue(value));
+        try {
+            return sizeRepository.findOne(byValue(value));
+        } catch (Exception e) {
+            // If duplicate sizes exist, get all and return the first one
+            List<Size> sizes = sizeRepository.findAll(byValue(value));
+            return sizes.isEmpty() ? Optional.empty() : Optional.of(sizes.get(0));
+        }
     }
 
     @Override

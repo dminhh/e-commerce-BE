@@ -37,7 +37,13 @@ public class ColorService implements IColorService {
 
     @Override
     public Optional<Color> getColorByCode(String code) {
-        return colorRepository.findOne(byCode(code));
+        try {
+            return colorRepository.findOne(byCode(code));
+        } catch (Exception e) {
+            // If duplicate colors exist, get all and return the first one
+            List<Color> colors = colorRepository.findAll(byCode(code));
+            return colors.isEmpty() ? Optional.empty() : Optional.of(colors.get(0));
+        }
     }
 
     @Override
