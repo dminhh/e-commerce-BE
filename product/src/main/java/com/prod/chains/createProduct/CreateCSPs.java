@@ -46,8 +46,8 @@ public class CreateCSPs implements ChainHandler<ProductInfo> {
             List<String> list = new ArrayList<>();
             initSig(productInfo3, list);
             for (ColorSizeQuantityInfo csquanDTO : chainData.getValue().getCsq()) {
-                Color color = createColorIfDoesntExist(csquanDTO.getCode(), csquanDTO.getColor());
-                Size size = createSizeIfDoesntExist(csquanDTO.getSize());
+                Color color = getColorOrThrow(csquanDTO.getCode(), csquanDTO.getColor());
+                Size size = getSizeOrThrow(csquanDTO.getSize());
                 list.add(color.getValue());
                 list.add(size.getValue());
                 Color_Size_Product csp = colorSizeProductService.createColorSizeProduct(
@@ -126,24 +126,19 @@ public class CreateCSPs implements ChainHandler<ProductInfo> {
     }
 
 
-    private Color createColorIfDoesntExist(String code, String value) {
-        Optional<Color> _color = colorService.getColorByCode(
-                code
-        );
-        return _color.orElseGet(() -> colorService.createColor(
-                Color.builder()
-                        .code(code)
-                        .value(value)
-                        .build()
-        ));
+    private Color getColorOrThrow(String code, String value) {
+        Optional<Color> _color = colorService.getColorByCode(code);
+        if (_color.isEmpty()) {
+            throw new IllegalArgumentException("Color with code '" + code + "' does not exist. Please create it in admin panel first.");
+        }
+        return _color.get();
     }
 
-    private Size createSizeIfDoesntExist(String value) {
+    private Size getSizeOrThrow(String value) {
         Optional<Size> _size = sizeService.getSizeByValue(value);
-        return _size.orElseGet(() -> sizeService.createSize(
-                Size.builder()
-                        .value(value)
-                        .build()
-        ));
+        if (_size.isEmpty()) {
+            throw new IllegalArgumentException("Size '" + value + "' does not exist. Please create it in admin panel first.");
+        }
+        return _size.get();
     }
 }
