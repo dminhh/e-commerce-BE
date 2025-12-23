@@ -18,6 +18,7 @@ import com.prod.services.products.IImageService;
 import com.prod.services.products.IProductService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import java.util.Optional;
 @Component
 @AllArgsConstructor
 @Builder
+@Slf4j
 public class GetProductByOrderProduct implements ChainHandler<OrderInfo> {
     private final IProductService productService;
     private final IColorService colorService;
@@ -38,18 +40,53 @@ public class GetProductByOrderProduct implements ChainHandler<OrderInfo> {
         if (chainData.isSuccess()) {
             OrderInfo dto = chainData.getValue();
             List<OrderProductInfo> products = new ArrayList<>();
+            log.info("Processing order_id: {} with {} products", dto.getId(), dto.getProducts().size());
+
             for (OrderProductInfo opDTO : dto.getProducts()) {
+                log.info("Processing order_product with csp_id: {}", opDTO.getCsp_id());
+
                 Optional<Color_Size_Product> csp = cspService.getColorSizeProductById(opDTO.getCsp_id());
+                if (csp.isEmpty()) {
+                    log.error("Color_Size_Product not found for csp_id: {}", opDTO.getCsp_id());
+                    continue;
+                }
+                log.info("Found CSP for csp_id: {}, product_id: {}, color_id: {}, size_id: {}",
+                    opDTO.getCsp_id(), csp.get().getProduct_id(), csp.get().getColor_id(), csp.get().getSize_id());
+
                 Optional<Product> product = productService.getProductById(csp.get().getProduct_id());
+                if (product.isEmpty()) {
+                    log.error("Product not found for product_id: {}", csp.get().getProduct_id());
+                    continue;
+                }
+
                 Optional<Color> color = colorService.getColorById(csp.get().getColor_id());
+                if (color.isEmpty()) {
+                    log.error("Color not found for color_id: {}", csp.get().getColor_id());
+                    continue;
+                }
+
                 Optional<Size> size = sizeService.getSizeById(csp.get().getSize_id());
+                if (size.isEmpty()) {
+                    log.error("Size not found for size_id: {}", csp.get().getSize_id());
+                    continue;
+                }
+
                 Optional<Image> image = imageService.getImageByProdIdAndType(product.get().getId(), Type_Image.ANH_NEN);
+                if (image.isEmpty()) {
+                    log.error("Image not found for product_id: {}", product.get().getId());
+                    continue;
+                }
+
                 OrderProductInfo dto1 = updateOrderProduct(opDTO, opDTO.getQuantity(), product.get(), color.get(), size.get(), image.get());
                 products.add(dto1);
+                log.info("Successfully processed order_product with csp_id: {}", opDTO.getCsp_id());
             }
+
             if (products.isEmpty()) {
+                log.error("No valid products found for order_id: {}", dto.getId());
                 chainData.setMessage("Gap loi khi tim danh sach san pham").setSuccess(false);
             } else {
+                log.info("Successfully processed {} products for order_id: {}", products.size(), dto.getId());
                 dto.setProducts(products);
                 chainData.setValue(dto).setSuccess(true);
             }
