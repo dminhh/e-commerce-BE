@@ -11,4 +11,6 @@ public interface ESProductRepository extends ElasticsearchRepository<ESProducts,
     Optional<ESProducts> findByDbId(String dbId);
     boolean existsByDbId(String dbId);
     Page<ESProducts> findAllByOrderByScoreDescUpdateAtDesc(Pageable pageable);
+    Page<ESProducts> findByTitleContaining(String title, Pageable pageable);
+    Page<ESProducts> findByTitle(String title, Pageable pageable);
 }

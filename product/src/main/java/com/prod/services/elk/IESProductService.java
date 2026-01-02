@@ -14,4 +14,7 @@ public interface IESProductService {
     ESProducts findProductByDbId(String id);
     ESProducts updateScore(String dbId, double scoreChange);
     boolean createListProduct(List<ESProducts> product);
+
+    // --- Hàm mới thêm vào ---
+    Page<ESProducts> searchProducts(String key, int page, int size);
 }

@@ -114,4 +114,21 @@ public class ESProductService implements IESProductService {
             return null;
         }
     }
+    // ESProductServiceImpl.java
+    public Page<ESProducts> searchProducts(String key, int page, int size) {
+        // 1. Xử lý null để tránh NullPointerException
+        if (key == null) {
+            key = "";
+        }
+
+        // 2. "Làm sạch" từ khóa: Xóa bỏ ngoặc kép và dấu sao do người dùng nhập
+        // Nếu người dùng nhập: "bộ quần áo" -> Sẽ thành: bộ quần áo
+        String sanitizedKey = key.replace("\"", "").replace("*", "").trim();
+
+        // 3. Gọi Repository với từ khóa đã làm sạch
+        // (Giả sử bạn đang dùng PageRequest để phân trang)
+        Pageable pageable = PageRequest.of(page, size);
+
+        return elkProductRepository.findByTitle(sanitizedKey, pageable);
+    }
 }

@@ -23,7 +23,7 @@ public class ESProducts {
     @Field(type = FieldType.Keyword)
     private String dbId;
 
-    @Field(type = FieldType.Keyword)  // Sử dụng kiểu Text cho trường title để có thể tìm kiếm
+    @Field(type = FieldType.Text, analyzer = "standard")
     private String title;
 
     @Field(type = FieldType.Double) // Kiểu Double cho giá

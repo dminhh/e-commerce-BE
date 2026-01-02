@@ -58,4 +58,33 @@ public class ESProductController {
             return false;
         }
     }
+    @GetMapping("/find")
+    public ResponseEntity<ResponseObject<Page<ProductInfo>>> findProduct(
+            @RequestParam(required = false, defaultValue = "") String key,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        try {
+            Page<ESProducts> esResult = iesProductService.searchProducts(key, page, size);
+
+            // --- THÊM LOG Ở ĐÂY ---
+            // Kiểm tra nếu kết quả không rỗng (có sản phẩm)
+            if (esResult.hasContent()) {
+                log.info("Found {} products for keyword '{}'", esResult.getTotalElements(), key);
+
+                // Nếu bạn muốn log chi tiết ID hoặc tên từng sản phẩm tìm được:
+                // esResult.forEach(p -> log.info("Product found: ID={}, Name={}", p.getId(), p.getTitle()));
+            } else {
+                log.info("No products found for keyword '{}'", key);
+            }
+            // ----------------------
+
+            Page<ProductInfo> productInfoPage = esResult.map(esToProductDTO::toProductInfo);
+
+            return ResponseEntity.ok(new ResponseObject<>(true, productInfoPage, "Found products successfully"));
+
+        } catch (Exception e) {
+            log.error("Search Error: ", e);
+            return ResponseEntity.status(500).body(new ResponseObject<>(false, null, "Internal Server Error"));
+        }
+    }
 }
