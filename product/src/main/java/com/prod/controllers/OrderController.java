@@ -1,6 +1,7 @@
 package com.prod.controllers;
 
 import com.common.DTO.ResponseObject;
+import com.common.utils.ConvertJson;
 import com.prod.facades.IOrderFacade;
 import com.prod.facades.data.BillInfo;
 import com.prod.facades.data.OrderInfo;
@@ -25,6 +26,9 @@ public class OrderController extends Controller<OrderInfo> {
     @Autowired
     private IOrderFacade orderFacade;
 
+    @Autowired
+    private ConvertJson convertJson;
+
     @PostMapping("/create")
     public ResponseEntity<ResponseObject<String>> createOrder(@RequestBody OrderInfo orderInfo,
                                                               HttpServletRequest request) {
@@ -35,7 +39,9 @@ public class OrderController extends Controller<OrderInfo> {
                 return notFoundUser();
             orderInfo.setUser_id(user.getId());
             orderInfo.setUser_email(accountRedis.getEmail());
-            orderProducer.send("create-order", orderInfo);
+//            orderProducer.send("create-order", orderInfo);
+//            OrderInfo orderInfo1 = convertJson.convertFromJson(orderInfo, OrderInfo.class);
+            orderFacade.createOrder(orderInfo);
             return ResponseEntity.ok().body(
                     ResponseObject.<String>builder()
                             .message("Dang xu ly don hang")
