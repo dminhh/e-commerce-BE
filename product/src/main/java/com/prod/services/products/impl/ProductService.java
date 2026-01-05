@@ -50,18 +50,21 @@ public class ProductService extends ServicePage<Product> implements IProductServ
     @Override
     public Page<Product> findProducts(Set<String> key, int page, int size, String sortField, String sortDirection) {
         String keywords = String.join(" ", key);
-        Specification<Product> keySpecs = Specification.where(
-                byKey(key));
         Pageable pageable = PageRequest.of(page - 1, size, getSortDirect(sortDirection), sortField);
+
+        // PRIMARY SEARCH: Split keywords và AND search trong title (chính xác)
+        Specification<Product> keySpecs = Specification.where(byTitleWithKeys(key));
         Page<Product> products = productRepository.findAll(keySpecs, pageable);
-        Page<Product> productPage = productRepository.findAll(
-                Specification.where(byDesLike(keywords).or(byTitleLike(keywords))), pageable
-        );
-        if (products.hasContent()) {
-            return products;
-        } else {
+
+        // FALLBACK SEARCH: Search cả cụm từ trong title (linh động)
+        if (!products.hasContent()) {
+            Page<Product> productPage = productRepository.findAll(
+                    Specification.where(byTitleLike(keywords)), pageable
+            );
             return productPage;
         }
+
+        return products;
     }
 
     @Override

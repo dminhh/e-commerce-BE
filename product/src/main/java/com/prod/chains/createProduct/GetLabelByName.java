@@ -26,23 +26,28 @@ public class GetLabelByName implements ChainHandler<ProductInfo> {
     @Override
     public Chain<ProductInfo> handle(ChainData<ProductInfo> chainData) {
         if (chainData.isSuccess()) {
-            ProductInfo dto = chainData.getValue();
-            List<Label_Product> labelProducts = labelProductService.getLabelProductsByProductId(
-                    chainData.getValue().getProductId()
-            );
-            List<Label> labels = getLabelByName(chainData.getValue().getLabel());
+            try {
+                ProductInfo dto = chainData.getValue();
+                List<Label_Product> labelProducts = labelProductService.getLabelProductsByProductId(
+                        chainData.getValue().getProductId()
+                );
+                List<Label> labels = getLabelByName(chainData.getValue().getLabel());
 
-            if (labelProducts.isEmpty()) {
-                List<String> labelsName = createListLabel(labels, chainData.getValue().getProductId());
-                dto.setLabel(labelsName);
-                chainData.setValue(dto).setSuccess(true);
-            } else {
-                for (Label_Product labelProduct : labelProducts) {
-                    labelProductService.deleteLabelProduct(labelProduct.getId());
+                if (labelProducts.isEmpty()) {
+                    List<String> labelsName = createListLabel(labels, chainData.getValue().getProductId());
+                    dto.setLabel(labelsName);
+                    chainData.setValue(dto).setSuccess(true);
+                } else {
+                    for (Label_Product labelProduct : labelProducts) {
+                        labelProductService.deleteLabelProduct(labelProduct.getId());
+                    }
+                    List<String> labelsName = createListLabel(labels, chainData.getValue().getProductId());
+                    dto.setLabel(labelsName);
+                    chainData.setValue(dto).setSuccess(true);
                 }
-                List<String> labelsName = createListLabel(labels, chainData.getValue().getProductId());
-                dto.setLabel(labelsName);
-                chainData.setValue(dto).setSuccess(true);
+            } catch (IllegalArgumentException e) {
+                // Catch validation error và set chainData thành fail
+                chainData.setSuccessStatus(false).setMessage(e.getMessage());
             }
         }
         return new Chain<>(this);
@@ -50,10 +55,25 @@ public class GetLabelByName implements ChainHandler<ProductInfo> {
 
     private List<Label> getLabelByName(List<String> labels) {
         List<Label> res = new ArrayList<>();
-        for (String label : labels) {
-            Optional<Label> labelOptional = labelService.getLabelByName(label);
-            labelOptional.ifPresent(res::add);
+        List<String> notFound = new ArrayList<>();
+
+        for (String labelName : labels) {
+            Optional<Label> labelOptional = labelService.getLabelByName(labelName);
+            if (labelOptional.isPresent()) {
+                res.add(labelOptional.get());
+            } else {
+                notFound.add(labelName);
+            }
         }
+
+        // Nếu có labels không tồn tại, throw exception
+        if (!notFound.isEmpty()) {
+            throw new IllegalArgumentException(
+                "Các label sau không tồn tại trong hệ thống: " + String.join(", ", notFound) +
+                ". Vui lòng tạo các label này trong admin panel trước khi thêm sản phẩm."
+            );
+        }
+
         return res;
     }
 

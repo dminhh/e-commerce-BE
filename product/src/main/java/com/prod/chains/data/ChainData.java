@@ -30,4 +30,8 @@ public class ChainData<T> {
         this.value = value;
         return this;
     }
+    public ChainData<T> setSuccessStatus(boolean success) {
+        this.success = success;
+        return this;
+    }
 }

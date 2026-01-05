@@ -333,21 +333,12 @@ public class ProductFacade implements IProductFacade {
         if (Objects.equals(key, "null"))
             products = productService.getProductsByPage(page, size, sortField, sortDirection).getContent();
         else {
-            List<String> keys = new ArrayList<>();
-            if (category != 0) {
-                keys.addAll(List.of(categoryService.getCategoryById(category).get().getName().split(" ")));
-            }
-            if (season != 0) {
-                keys.addAll(List.of(seasonService.getSeasonById(season).get().getName().split(" ")));
-            }
-            if (!labels.isEmpty()) {
-                for (Integer label : labels) {
-                    keys.add(labelService.getLabelById(label).get().getName());
-                }
-            }
-            keys.addAll(List.of(key.split(" ")));
+            // Đơn giản hóa: Chỉ search theo title, bỏ category/season/labels
+            // Split keyword thành các từ riêng biệt
+            List<String> keys = new ArrayList<>(List.of(key.split(" ")));
             Set<String> setKey = new LinkedHashSet<>();
             for (String key1 : keys) {
+                // Normalize: Capitalize first letter, lowercase rest
                 setKey.add(key1.substring(0, 1).toUpperCase() + key1.substring(1).toLowerCase());
             }
             products = productService.findProducts(setKey, page, size, sortField, sortDirection).getContent();
