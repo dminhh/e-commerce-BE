@@ -351,7 +351,7 @@ public class ProductFacade implements IProductFacade {
         if (res.isEmpty()) {
             return emptyProduct();
         } else {
-            sort(sortField, sortDirection, res);
+            // sort(sortField, sortDirection, res); // Database đã sort rồi, không cần sort lại
             Page<ProductInfo> resDTO = new PageImpl<>(res, PageRequest.of(page, size), products.size());
             return successP(resDTO);
         }
@@ -418,10 +418,10 @@ public class ProductFacade implements IProductFacade {
                 .add(GetCateAndSeasonById.builder()
                         .seasonService(seasonService)
                         .categoryService(categoryService)
-                        .build())
-                .add(CreateSignature.builder()
-                        .productService(productService)
                         .build());
+                // .add(CreateSignature.builder()  // BUG: GET operation không nên update DB
+                //         .productService(productService)
+                //         .build());
         chain.execute(chainData);
         if (!chainData.isSuccess()) log.error(chainData.getMessage() + "/n" + chainData.getValue());
         return chainData;

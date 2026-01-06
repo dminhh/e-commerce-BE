@@ -45,6 +45,25 @@ public interface ProductRepository extends JpaRepository<Product, Integer>,
             };
         }
 
+        /**
+         * Search trong title với nhiều keywords (AND logic)
+         * Ví dụ: ["Red", "Summer"] -> title LIKE '%red%' AND title LIKE '%summer%'
+         */
+        static Specification<Product> byTitleWithKeys(Set<String> keys) {
+            return (root, query, criteriaBuilder)
+                    -> {
+                List<Predicate> predicates = new ArrayList<>();
+                for (String keyword : keys) {
+                    predicates.add(
+                            criteriaBuilder.like(
+                                    criteriaBuilder.lower(root.get("title")),
+                                    "%" + keyword.toLowerCase() + "%")
+                    );
+                }
+                return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+            };
+        }
+
         static Specification<Product> byTitleLike(String key) {
             return (root, query, criteriaBuilder)
                     -> criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), "%" + key.toLowerCase() + "%");

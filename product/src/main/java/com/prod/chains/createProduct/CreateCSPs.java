@@ -69,6 +69,7 @@ public class CreateCSPs implements ChainHandler<ProductInfo> {
                                 .size(size.getValue())
                                 .size_id(size.getId())
                                 .csq_id(csp.getId())
+                                .quantity(s_quantity.getQuantity())
                                 .sold(s_quantity.getSold())
                                 .build()
                 );
