@@ -180,4 +180,100 @@ public class CartFacade implements ICartFacade {
             return null;
         }
     }
+    @Override
+    public ResponseObject<Page<CartInfo>> deleteCartProduct(int cartProductId, int userId, int page, int size) {
+        try {
+            // Kiểm tra cart product có tồn tại không
+            Optional<Cart_Product> cartProduct = cartProductService.getCartProductById(cartProductId);
+
+            if (cartProduct.isEmpty()) {
+                return ResponseObject.<Page<CartInfo>>builder()
+                        .message("Khong tim thay san pham trong gio hang")
+                        .build();
+            }
+
+            // Kiểm tra cart có thuộc về user không
+            Optional<Cart> cart = cartService.getCartByUserId(userId);
+            if (cart.isEmpty() || cart.get().getId() != cartProduct.get().getCart_id()) {
+                return ResponseObject.<Page<CartInfo>>builder()
+                        .message("Khong co quyen xoa san pham nay")
+                        .build();
+            }
+
+            // Xóa sản phẩm
+            cartProductService.deleteCartProduct(cartProductId);
+
+            // Trả về cart mới sau khi xóa
+            return getCartByUserId(userId, null, page, size);
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseObject.<Page<CartInfo>>builder()
+                    .message("Gap loi khi xoa san pham khoi gio hang")
+                    .build();
+        }
+    }
+
+    @Override
+    public ResponseObject<Page<CartInfo>> updateCartProductQuantity(int cartProductId, int quantity, int userId, int page, int size) {
+        try {
+            // Validate quantity
+            if (quantity <= 0) {
+                return ResponseObject.<Page<CartInfo>>builder()
+                        .message("So luong phai lon hon 0")
+                        .build();
+            }
+
+            // Kiểm tra cart product có tồn tại không
+            Optional<Cart_Product> cartProductOpt = cartProductService.getCartProductById(cartProductId);
+
+            if (cartProductOpt.isEmpty()) {
+                return ResponseObject.<Page<CartInfo>>builder()
+                        .message("Khong tim thay san pham trong gio hang")
+                        .build();
+            }
+
+            Cart_Product cartProduct = cartProductOpt.get();
+
+            // Kiểm tra cart có thuộc về user không
+            Optional<Cart> cart = cartService.getCartByUserId(userId);
+            if (cart.isEmpty() || cart.get().getId() != cartProduct.getCart_id()) {
+                return ResponseObject.<Page<CartInfo>>builder()
+                        .message("Khong co quyen cap nhat san pham nay")
+                        .build();
+            }
+
+            // Kiểm tra số lượng còn đủ trong kho không
+            Optional<Color_Size_Product> csp = cspService.getColorSizeProductById(cartProduct.getColor_size_product_id());
+            if (csp.isEmpty()) {
+                return ResponseObject.<Page<CartInfo>>builder()
+                        .message("Khong tim thay san pham")
+                        .build();
+            }
+
+            // Lấy số lượng còn lại trong kho
+            int availableQuantity = smallQuantityService.getByCSProductId(csp.get().getId())
+                    .map(sq -> sq.getQuantity())
+                    .orElse(0);
+
+            if (quantity > availableQuantity) {
+                return ResponseObject.<Page<CartInfo>>builder()
+                        .message("So luong vuot qua ton kho. Chi con " + availableQuantity + " san pham")
+                        .build();
+            }
+
+            // Cập nhật quantity
+            cartProduct.setQuantity(quantity);
+            cartProductService.createCartProduct(cartProduct); // save/update
+
+            // Trả về cart mới sau khi cập nhật
+            return getCartByUserId(userId, null, page, size);
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseObject.<Page<CartInfo>>builder()
+                    .message("Gap loi khi cap nhat so luong")
+                    .build();
+        }
+    }
 }

@@ -108,4 +108,51 @@ public class CartController extends Controller<CartInfo> {
                         .build()
         );
     }
+    @DeleteMapping("/delete/{cartProductId}")
+    public ResponseEntity<ResponseObject<Page<CartInfo>>> deleteCartProduct(
+            @PathVariable int cartProductId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
+        try {
+            UserRedis userRedis = getUser(request);
+            if (userRedis == null) {
+                return ResponseEntity.badRequest().body(
+                        ResponseObject.<Page<CartInfo>>builder()
+                                .message(NOT_FOUND_USER)
+                                .build()
+                );
+            } else {
+                ResponseObject<Page<CartInfo>> res = cartFacade.deleteCartProduct(cartProductId, userRedis.getId(), page, size);
+                return ResponseEntity.ok().body(res);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return serverErrorsP();
+        }
+    }
+    @PutMapping("/update-quantity/{cartProductId}")
+    public ResponseEntity<ResponseObject<Page<CartInfo>>> updateQuantity(
+            @PathVariable int cartProductId,
+            @RequestParam int quantity,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
+        try {
+            UserRedis userRedis = getUser(request);
+            if (userRedis == null) {
+                return ResponseEntity.badRequest().body(
+                        ResponseObject.<Page<CartInfo>>builder()
+                                .message(NOT_FOUND_USER)
+                                .build()
+                );
+            } else {
+                ResponseObject<Page<CartInfo>> res = cartFacade.updateCartProductQuantity(cartProductId, quantity, userRedis.getId(), page, size);
+                return ResponseEntity.ok().body(res);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return serverErrorsP();
+        }
+    }
 }

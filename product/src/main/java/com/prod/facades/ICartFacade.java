@@ -15,4 +15,8 @@ public interface ICartFacade {
     ResponseObject<Page<CartInfo>> getCartByUserId(int userId, AccountRedis accountRedis, int page, int size);
     ResponseObject<Page<Color_Size_Product>> getCSP(int cartId, int page, int size, String field, String direct);
     ResponseObject<Page<CartInfo>> updateCartByUserId(List<CartProductInfo> cartProductInfo, int userId, int page, int size);
+    ResponseObject<Page<CartInfo>> deleteCartProduct(int cartProductId, int userId, int page, int size);
+
+    // Cập nhật quantity
+    ResponseObject<Page<CartInfo>> updateCartProductQuantity(int cartProductId, int quantity, int userId, int page, int size);
 }
