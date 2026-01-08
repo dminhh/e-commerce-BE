@@ -28,7 +28,7 @@ public class CheckIfQuantityEnough implements ChainHandler<CartInfo> {
         if (chainData.isSuccess()) {
             Optional<Small_Quantity> sm = smallQuantityService.getByCSProductId(chainData.getValue().getCspId());
             if (sm.isPresent()) {
-                if (sm.get().getQuantity() > chainData.getValue().getQuantity()) {
+                if (sm.get().getQuantity() >= chainData.getValue().getQuantity()) {
                     CartInfo dto = chainData.getValue();
                     List<Cart_Product> cp = cartProductService.getCartProductsByCartId(chainData.getCartId());
                     if (!cp.isEmpty()) {
